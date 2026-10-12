@@ -18,7 +18,6 @@ public final class PackingComparator
         // static methods only
     }
 
-
     /**
      * Returns the required units that were not packed, in required-list order.
      *
@@ -37,7 +36,6 @@ public final class PackingComparator
         requireChains(required, packed);
         return unmatched(required, packed);
     }
-
 
     /**
      * Returns the packed units that were not required, in packed-list order.
@@ -58,7 +56,6 @@ public final class PackingComparator
         return unmatched(packed, required);
     }
 
-
     /**
      * Returns the units of wanted that have no partner in available.
      *
@@ -74,6 +71,7 @@ public final class PackingComparator
     {
         LinkedChain<PackingItem> pool = available.copy();
         LinkedChain<PackingItem> result = new LinkedChain<PackingItem>();
+
         for (int i = 0; i < wanted.size(); i++)
         {
             PackingItem item = wanted.get(i);
@@ -84,7 +82,6 @@ public final class PackingComparator
         }
         return result;
     }
-
 
     /**
      * Rejects null input chains.
