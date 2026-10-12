@@ -41,7 +41,7 @@ We also updated removal and clearing operations to keep `lastNode` correct when 
 - “Show items” does not group duplicate items into quantities, although comparison results do.
 - The app does not ask for confirmation before exiting.
 - Unassigned-item tracking is not built.
-- In the Claude prototype described in the code summary, all 91 tests pass. The final repository version must be run again before submission.
+
 
 ## Next Steps
 
@@ -68,6 +68,17 @@ We also updated removal and clearing operations to keep `lastNode` correct when 
 | Item display and exit | Grouped quantities, empty display, valid and canceled exit confirmation, end of input | Erik |
 | Save/load | Round trip, empty session, missing file, malformed data, overlength fields, failed load preserving current data | Erik |
 | Regression | Rerun chain, model, comparator, app, and generic-safety checks after each change | Vincy and Erik |
+
+## How to Run
+
+This project uses Java 8 and can be run in Eclipse.
+
+1. Open Eclipse and import the project using **File → Import → General → Existing Projects into Workspace**.
+2. Select the PackCheck project folder and finish the import.
+3. Open `src/PackCheckApp.java`.
+4. Right-click the file and choose **Run As → Java Application**.
+
+To run the tests, make sure the course `student.jar` is on the project’s build path. Then right-click a test class in `src` and choose **Run As → JUnit Test**.
 
 ## Attribution
 
