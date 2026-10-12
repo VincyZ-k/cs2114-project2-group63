@@ -23,3 +23,6 @@
 hs_err_pid*
 replay_pid*
 /bin/
+
+# Local PackCheck session data
+/packcheck-data.txt

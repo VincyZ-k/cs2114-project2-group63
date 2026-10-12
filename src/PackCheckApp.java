@@ -1,4 +1,7 @@
+import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Scanner;
 
 /**
@@ -17,6 +20,7 @@ public class PackCheckApp
     private final PrintStream output;
     private final LinkedChain<Traveler> travelers;
     private final LinkedChain<TripReminder> reminders;
+    private final Path storageFile;
     private Traveler selectedTraveler;
 
     /**
@@ -31,6 +35,24 @@ public class PackCheckApp
      */
     public PackCheckApp(Scanner input, PrintStream output)
     {
+        this(input, output, null);
+    }
+
+
+    /**
+     * Creates an app with optional persistent storage. The two-argument
+     * constructor intentionally disables storage so scripted unit tests remain
+     * isolated from a user's real save file.
+     *
+     * @param input
+     *            where commands are read from
+     * @param output
+     *            where prompts and results are written
+     * @param storageFile
+     *            save-file path, or null to keep the session in memory only
+     */
+    PackCheckApp(Scanner input, PrintStream output, Path storageFile)
+    {
         if (input == null || output == null)
         {
             throw new IllegalArgumentException(
@@ -38,9 +60,33 @@ public class PackCheckApp
         }
         this.input = input;
         this.output = output;
-        travelers = new LinkedChain<Traveler>();
-        reminders = new LinkedChain<TripReminder>();
-        selectedTraveler = null;
+        this.storageFile = storageFile;
+
+        LinkedChain<Traveler> loadedTravelers =
+            new LinkedChain<Traveler>();
+        LinkedChain<TripReminder> loadedReminders =
+            new LinkedChain<TripReminder>();
+        Traveler loadedSelection = null;
+        if (storageFile != null)
+        {
+            try
+            {
+                PackCheckStorage.Snapshot snapshot =
+                    PackCheckStorage.load(storageFile);
+                loadedTravelers = snapshot.getTravelers();
+                loadedReminders = snapshot.getReminders();
+                loadedSelection = snapshot.getSelectedTraveler();
+            }
+            catch (IOException e)
+            {
+                output.println(
+                    "Warning: saved data could not be loaded. "
+                        + "Starting with an empty session.");
+            }
+        }
+        travelers = loadedTravelers;
+        reminders = loadedReminders;
+        selectedTraveler = loadedSelection;
     }
 
 
@@ -77,7 +123,10 @@ public class PackCheckApp
      */
     public static void main(String[] args)
     {
-        new PackCheckApp(new Scanner(System.in), System.out).run();
+        new PackCheckApp(
+            new Scanner(System.in),
+            System.out,
+            Paths.get("packcheck-data.txt")).run();
     }
 
     // ----------------------------------------------------------------
@@ -195,6 +244,7 @@ public class PackCheckApp
             selectedTraveler = traveler;
             output.println("Selected " + traveler.getName() + ".");
         }
+        saveData();
     }
 
 
@@ -215,6 +265,7 @@ public class PackCheckApp
         int position = readInt("Traveler number: ", 1, travelers.size());
         selectedTraveler = travelers.get(position - 1);
         output.println("Selected " + selectedTraveler.getName() + ".");
+        saveData();
     }
 
 
@@ -270,6 +321,7 @@ public class PackCheckApp
         PackingItem item = readItem();
         selectedTraveler.addItem(list, item);
         output.println("Added " + item + " to " + label(list) + ".");
+        saveData();
     }
 
 
@@ -291,6 +343,7 @@ public class PackCheckApp
         output.println(
             "Inserted " + item + " at position " + position + " of "
                 + label(list) + ".");
+        saveData();
     }
 
 
@@ -319,6 +372,7 @@ public class PackCheckApp
             items.size());
         PackingItem removed = selectedTraveler.removeItem(list, position - 1);
         output.println("Removed " + removed + " from " + label(list) + ".");
+        saveData();
     }
 
 
@@ -425,6 +479,7 @@ public class PackCheckApp
         }
         reminders.addToEnd(reminder);
         output.println("Added reminder: " + reminder);
+        saveData();
     }
 
 
@@ -459,6 +514,35 @@ public class PackCheckApp
             1,
             reminders.size());
         output.println("Removed reminder: " + reminders.removeAt(position - 1));
+        saveData();
+    }
+
+    // ----------------------------------------------------------------
+    // Persistence
+
+
+    /**
+     * Writes the complete current state when persistence is enabled. A failed
+     * save is reported without ending the interactive session.
+     */
+    private void saveData()
+    {
+        if (storageFile == null)
+        {
+            return;
+        }
+        try
+        {
+            PackCheckStorage.save(
+                storageFile,
+                travelers,
+                reminders,
+                selectedTraveler);
+        }
+        catch (IOException e)
+        {
+            output.println("Warning: current data could not be saved.");
+        }
     }
 
     // ----------------------------------------------------------------

@@ -71,7 +71,7 @@ We also updated removal and clearing operations to keep `lastNode` correct when 
 
 ## How to Run
 
-This project uses Java 8 and can be run in Eclipse.
+This project uses Java 17 and can be run in Eclipse.
 
 1. Open Eclipse and import the project using **File → Import → General → Existing Projects into Workspace**.
 2. Select the PackCheck project folder and finish the import.
