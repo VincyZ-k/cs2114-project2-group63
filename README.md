@@ -2,6 +2,12 @@
 
 PackCheck is a text-based packing checklist for multiple travelers. Each traveler has a required list and a packed list. Duplicate items represent quantities: if three socks are required and two are packed, one sock is missing. Trip reminders are shared by all travelers.
 
+## System Diagram
+
+![PackCheck system diagram](PackCheck-System-Diagram.png)
+
+
+
 ## Reflection
 
 ### What changed from our specification?
